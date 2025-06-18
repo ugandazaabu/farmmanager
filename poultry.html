@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Poultry Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f7f9fc;
+    }
+    header {
+      background: #2e8b57;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    nav button, nav a.tab-btn {
+      flex: 1 1 120px;
+      margin: 5px;
+      padding: 10px;
+      border: none;
+      background: #2e8b57;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    nav button.active {
+      background: #276847;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+    .form-container.active {
+      display: block;
+    }
+    form label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    form textarea {
+      resize: vertical;
+    }
+    form button {
+      margin-top: 20px;
+      background: #2e8b57;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background: #276847;
+    }
+    .report-container {
+      display: none;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    /* Make tables horizontally scrollable on small screens */
+    .report-table-wrapper {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      min-width: 900px; /* force scroll on small screens */
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #2e8b57;
+      color: white;
+    }
+    .actions button {
+      background-color: #e63946;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      margin-right: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .actions button.edit {
+      background-color: #457b9d;
+    }
+    /* Collapsible report sections styling */
+    .report-section {
+      margin-bottom: 30px;
+    }
+    .report-section summary {
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 10px;
+      background: #2e8b57;
+      color: white;
+      border-radius: 6px;
+      user-select: none;
+    }
+    .report-section summary:hover {
+      background: #276847;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Poultry Section</h1>
+  </header>
+  <nav>
+    <button class="poultry-tab active" data-target="broilers">Broilers</button>
+    <button class="poultry-tab" data-target="layers">Layers</button>
+    <button class="poultry-tab" data-target="kuroilers">Kuroilers</button>
+    <button class="poultry-tab" data-target="sassos">Sassos</button>
+    <button class="poultry-tab" data-target="other">Other</button>
+    <button id="viewReports">Reports</button>
+  </nav>
+
+  <!-- Form Template -->
+  <template id="form-template">
+    <div class="form-container">
+      <h2>Track <span class="animal-name"></span></h2>
+      <form>
+        <label>Date</label><input type="date" name="date" required />
+        <label>Number of Birds</label><input type="number" name="count" required />
+        <label>Types of Feeds</label><input type="text" name="feedType" required />
+        <label>Quantity of Feeds (kg)</label><input type="number" name="feedQty" required />
+        <label>Weights (kg)</label><input type="number" name="weights" required />
+        <label>Feaces Observation</label><input type="text" name="feaces" />
+        <label>Week Number</label><input type="number" name="week" required />
+        <label>Vaccination</label><input type="text" name="vaccination" required />
+        <label>Doses Administered</label><input type="text" name="dose" />
+        <label>Cost (UGX)</label><input type="number" name="cost" required />
+        <label>Notes / Comments</label><textarea name="comments"></textarea>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </template>
+
+  <!-- Form containers for each poultry type -->
+  <div id="broilers" class="form-container active">
+    <h2>Track Broilers</h2>
+    <form name="broilerForm">
+      <label>Date</label><input type="date" name="date" required />
+      <label>Number of Birds</label><input type="number" name="count" required />
+      <label>Types of Feeds</label><input type="text" name="feedType" required />
+      <label>Quantity of Feeds (kg)</label><input type="number" name="feedQty" required />
+      <label>Weights (kg)</label><input type="number" name="weights" required />
+      <label>Feaces Observation</label><input type="text" name="feaces" />
+      <label>Week Number</label><input type="number" name="week" required />
+      <label>Vaccination</label><input type="text" name="vaccination" required />
+      <label>Doses Administered</label><input type="text" name="dose" />
+      <label>Cost (UGX)</label><input type="number" name="cost" required />
+      <label>Notes / Comments</label><textarea name="comments"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <div id="layers" class="form-container">
+    <h2>Track Layers</h2>
+    <form name="layerForm">
+      <label>Date</label><input type="date" name="date" required />
+      <label>Number of Birds</label><input type="number" name="count" required />
+      <label>Types of Feeds</label><input type="text" name="feedType" required />
+      <label>Quantity of Feeds (kg)</label><input type="number" name="feedQty" required />
+      <label>Weights (kg)</label><input type="number" name="weights" required />
+      <label>Feaces Observation</label><input type="text" name="feaces" />
+      <label>Week Number</label><input type="number" name="week" required />
+      <label>Vaccination</label><input type="text" name="vaccination" required />
+      <label>Doses Administered</label><input type="text" name="dose" />
+      <label>Cost (UGX)</label><input type="number" name="cost" required />
+      <label>Notes / Comments</label><textarea name="comments"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <div id="kuroilers" class="form-container">
+    <h2>Track Kuroilers</h2>
+    <form name="kuroilerForm">
+      <label>Date</label><input type="date" name="date" required />
+      <label>Number of Birds</label><input type="number" name="count" required />
+      <label>Types of Feeds</label><input type="text" name="feedType" required />
+      <label>Quantity of Feeds (kg)</label><input type="number" name="feedQty" required />
+      <label>Weights (kg)</label><input type="number" name="weights" required />
+      <label>Feaces Observation</label><input type="text" name="feaces" />
+      <label>Week Number</label><input type="number" name="week" required />
+      <label>Vaccination</label><input type="text" name="vaccination" required />
+      <label>Doses Administered</label><input type="text" name="dose" />
+      <label>Cost (UGX)</label><input type="number" name="cost" required />
+      <label>Notes / Comments</label><textarea name="comments"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <div id="sassos" class="form-container">
+    <h2>Track Sassos</h2>
+    <form name="sassoForm">
+      <label>Date</label><input type="date" name="date" required />
+      <label>Number of Birds</label><input type="number" name="count" required />
+      <label>Types of Feeds</label><input type="text" name="feedType" required />
+      <label>Quantity of Feeds (kg)</label><input type="number" name="feedQty" required />
+      <label>Weights (kg)</label><input type="number" name="weights" required />
+      <label>Feaces Observation</label><input type="text" name="feaces" />
+      <label>Week Number</label><input type="number" name="week" required />
+      <label>Vaccination</label><input type="text" name="vaccination" required />
+      <label>Doses Administered</label><input type="text" name="dose" />
+      <label>Cost (UGX)</label><input type="number" name="cost" required />
+      <label>Notes / Comments</label><textarea name="comments"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <div id="other" class="form-container">
+    <h2>Track Other Poultry</h2>
+    <form name="otherForm">
+      <label>Date</label><input type="date" name="date" required />
+      <label>Number of Birds</label><input type="number" name="count" required />
+      <label>Types of Feeds</label><input type="text" name="feedType" required />
+      <label>Quantity of Feeds (kg)</label><input type="number" name="feedQty" required />
+      <label>Weights (kg)</label><input type="number" name="weights" required />
+      <label>Feaces Observation</label><input type="text" name="feaces" />
+      <label>Week Number</label><input type="number" name="week" required />
+      <label>Vaccination</label><input type="text" name="vaccination" required />
+      <label>Doses Administered</label><input type="text" name="dose" />
+      <label>Cost (UGX)</label><input type="number" name="cost" required />
+      <label>Notes / Comments</label><textarea name="comments"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <div class="report-container" id="reports">
+    <h2>Reports</h2>
+
+    <details class="report-section" open>
+      <summary>Broilers</summary>
+      <div class="report-table-wrapper">
+        <table id="broilerTable" class="report-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Birds</th><th>Feed Type</th><th>Qty</th><th>Weights</th>
+              <th>Feaces</th><th>Week</th><th>Vaccination</th><th>Doses</th><th>Cost</th><th>Comments</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="report-section" open>
+      <summary>Layers</summary>
+      <div class="report-table-wrapper">
+        <table id="layerTable" class="report-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Birds</th><th>Feed Type</th><th>Qty</th><th>Weights</th>
+              <th>Feaces</th><th>Week</th><th>Vaccination</th><th>Doses</th><th>Cost</th><th>Comments</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="report-section" open>
+      <summary>Kuroilers</summary>
+      <div class="report-table-wrapper">
+        <table id="kuroilerTable" class="report-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Birds</th><th>Feed Type</th><th>Qty</th><th>Weights</th>
+              <th>Feaces</th><th>Week</th><th>Vaccination</th><th>Doses</th><th>Cost</th><th>Comments</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="report-section" open>
+      <summary>Sassos</summary>
+      <div class="report-table-wrapper">
+        <table id="sassoTable" class="report-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Birds</th><th>Feed Type</th><th>Qty</th><th>Weights</th>
+              <th>Feaces</th><th>Week</th><th>Vaccination</th><th>Doses</th><th>Cost</th><th>Comments</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="report-section" open>
+      <summary>Other</summary>
+      <div class="report-table-wrapper">
+        <table id="otherTable" class="report-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Birds</th><th>Feed Type</th><th>Qty</th><th>Weights</th>
+              <th>Feaces</th><th>Week</th><th>Vaccination</th><th>Doses</th><th>Cost</th><th>Comments</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+
+  <script>
+    const tabButtons = document.querySelectorAll('.poultry-tab');
+    const forms = document.querySelectorAll('.form-container');
+    const reports = document.getElementById('reports');
+    const animalTypes = ['broilers', 'layers', 'kuroilers', 'sassos', 'other'];
+
+    // Mapping form names to storage keys and table IDs
+    const storageMap = {
+      broilers: { formName: 'broilerForm', tableId: 'broilerTable' },
+      layers: { formName: 'layerForm', tableId: 'layerTable' },
+      kuroilers: { formName: 'kuroilerForm', tableId: 'kuroilerTable' },
+      sassos: { formName: 'sassoForm', tableId: 'sassoTable' },
+      other: { formName: 'otherForm', tableId: 'otherTable' },
+    };
+
+    // Show form on tab click
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        forms.forEach(form => form.classList.remove('active'));
+        reports.style.display = 'none';
+
+        button.classList.add('active');
+        const targetId = button.dataset.target;
+        if (targetId !== 'other') {
+          document.getElementById(targetId).classList.add('active');
+        }
+      });
+    });
+
+    // Handle Reports button
+    document.getElementById('viewReports').addEventListener('click', () => {
+      forms.forEach(f => f.classList.remove('active'));
+      reports.style.display = 'block';
+      displayAllReports();
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+    });
+
+    // Save and load data for all forms
+    animalTypes.forEach(type => {
+      const form = document.forms[storageMap[type].formName];
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        saveFormData(type, form);
+      });
+    });
+
+    // Save form data to localStorage
+    function saveFormData(type, form) {
+      const data = {
+        date: form.date.value,
+        count: form.count.value,
+        feedType: form.feedType.value,
+        feedQty: form.feedQty.value,
+        weights: form.weights.value,
+        feaces: form.feaces.value,
+        week: form.week.value,
+        vaccination: form.vaccination.value,
+        dose: form.dose.value,
+        cost: form.cost.value,
+        comments: form.comments.value,
+      };
+
+      let records = JSON.parse(localStorage.getItem(type)) || [];
+      records.push(data);
+      localStorage.setItem(type, JSON.stringify(records));
+      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} record saved!`);
+      form.reset();
+      displayReport(type);
+    }
+
+    // Display all reports on the reports page
+    function displayAllReports() {
+      animalTypes.forEach(type => {
+        displayReport(type);
+      });
+    }
+
+    // Populate table with saved records
+    function displayReport(type) {
+      const tableBody = document.querySelector(`#${storageMap[type].tableId} tbody`);
+      tableBody.innerHTML = '';
+      const records = JSON.parse(localStorage.getItem(type)) || [];
+
+      records.forEach((record, index) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${record.date}</td>
+          <td>${record.count}</td>
+          <td>${record.feedType}</td>
+          <td>${record.feedQty}</td>
+          <td>${record.weights}</td>
+          <td>${record.feaces}</td>
+          <td>${record.week}</td>
+          <td>${record.vaccination}</td>
+          <td>${record.dose}</td>
+          <td>${record.cost}</td>
+          <td>${record.comments}</td>
+          <td class="actions">
+            <button class="edit" data-type="${type}" data-index="${index}">Edit</button>
+            <button class="delete" data-type="${type}" data-index="${index}">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Handle Edit and Delete buttons using event delegation
+    document.getElementById('reports').addEventListener('click', e => {
+      if (e.target.classList.contains('delete')) {
+        const type = e.target.dataset.type;
+        const index = e.target.dataset.index;
+        deleteRecord(type, index);
+      } else if (e.target.classList.contains('edit')) {
+        const type = e.target.dataset.type;
+        const index = e.target.dataset.index;
+        editRecord(type, index);
+      }
+    });
+
+    function deleteRecord(type, index) {
+      if (confirm('Are you sure you want to delete this record?')) {
+        let records = JSON.parse(localStorage.getItem(type)) || [];
+        records.splice(index, 1);
+        localStorage.setItem(type, JSON.stringify(records));
+        displayReport(type);
+      }
+    }
+
+    function editRecord(type, index) {
+      let records = JSON.parse(localStorage.getItem(type)) || [];
+      const record = records[index];
+      if (!record) return alert('Record not found.');
+
+      // Show form tab for this animal
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      forms.forEach(f => f.classList.remove('active'));
+      const tabBtn = [...tabButtons].find(btn => btn.dataset.target === type);
+      if (tabBtn) tabBtn.classList.add('active');
+      document.getElementById(type).classList.add('active');
+      reports.style.display = 'none';
+
+      // Fill form with record data
+      const form = document.forms[storageMap[type].formName];
+      form.date.value = record.date;
+      form.count.value = record.count;
+      form.feedType.value = record.feedType;
+      form.feedQty.value = record.feedQty;
+      form.weights.value = record.weights;
+      form.feaces.value = record.feaces;
+      form.week.value = record.week;
+      form.vaccination.value = record.vaccination;
+      form.dose.value = record.dose;
+      form.cost.value = record.cost;
+      form.comments.value = record.comments;
+
+      // Change Save button text to 'Update'
+      const saveBtn = form.querySelector('button[type="submit"]');
+      saveBtn.textContent = 'Update';
+
+      // Remove previous submit listener to prevent stacking
+      form.onsubmit = null;
+
+      // Add a new submit handler for updating record
+      form.onsubmit = e => {
+        e.preventDefault();
+        const updatedData = {
+          date: form.date.value,
+          count: form.count.value,
+          feedType: form.feedType.value,
+          feedQty: form.feedQty.value,
+          weights: form.weights.value,
+          feaces: form.feaces.value,
+          week: form.week.value,
+          vaccination: form.vaccination.value,
+          dose: form.dose.value,
+          cost: form.cost.value,
+          comments: form.comments.value,
+        };
+        records[index] = updatedData;
+        localStorage.setItem(type, JSON.stringify(records));
+        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} record updated!`);
+        form.reset();
+        saveBtn.textContent = 'Save';
+        displayReport(type);
+
+        // Restore default submit handler to add new records
+        form.onsubmit = null;
+        form.addEventListener('submit', evt => {
+          evt.preventDefault();
+          saveFormData(type, form);
+        });
+
+        // Switch to reports tab after update
+        forms.forEach(f => f.classList.remove('active'));
+        reports.style.display = 'block';
+      };
+    }
+
+    // Initialize display
+    displayAllReports();
+    function getFishData() {
+  return JSON.parse(localStorage.getItem('fishData') || '[]');
+}
+
+function saveFishData(data) {
+  localStorage.setItem('fishData', JSON.stringify(data));
+}
+
+fishForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const newData = {
+    date: fishForm.date.value,
+    type: fishForm.type.value.trim(),
+    quantity: parseInt(fishForm.quantity.value),
+    notes: fishForm.notes.value.trim(),
+  };
+  const data = getFishData();
+  data.push(newData);
+  saveFishData(data);
+  fishForm.reset();
+  displayFishRecords();
+});
+
+  </script>
+</body>
+</html>

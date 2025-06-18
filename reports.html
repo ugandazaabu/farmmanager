@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Farm Reports - Download All Records</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      padding: 20px;
+      margin: 0;
+    }
+    h2 {
+      color: #2e8b57;
+    }
+    button {
+      background-color: #2e8b57;
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #276847;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #2e8b57;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+  <h2>Farm Data Reports</h2>
+  <p>Download all your records combined into one file.</p>
+  <button id="downloadAllBtn">Download All Records (CSV)</button>
+
+  <script>
+    function getData(key) {
+      return JSON.parse(localStorage.getItem(key) || '[]');
+    }
+
+    function escapeCSV(value) {
+      if (typeof value === 'string') {
+        return `"${value.replace(/"/g, '""')}"`; // Escape quotes for CSV
+      }
+      return value;
+    }
+
+    function downloadCSV(filename, csvContent) {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('downloadAllBtn').addEventListener('click', () => {
+      // Get data from all categories
+      const poultry = getData('poultryData');
+      const rabbits = getData('rabbitsData');
+      const pigs = getData('pigsData');
+      const fish = getData('fishData');
+
+      // Check if there is any data
+      if (poultry.length === 0 && rabbits.length === 0 && pigs.length === 0 && fish.length === 0) {
+        alert('No data found in any category to download.');
+        return;
+      }
+
+      // Prepare CSV header
+      const header = ['Category', 'Date', 'Type', 'Quantity', 'Notes'];
+      let rows = [];
+
+      // Helper to map records to CSV rows with category label
+      function mapRecords(records, category) {
+        return records.map(r => [
+          category,
+          r.date || '',
+          r.type || '',
+          r.quantity || '',
+          r.notes || '',
+        ]);
+      }
+
+      // Combine all rows
+      rows = rows.concat(mapRecords(poultry, 'Poultry'));
+      rows = rows.concat(mapRecords(rabbits, 'Rabbits'));
+      rows = rows.concat(mapRecords(pigs, 'Pigs'));
+      rows = rows.concat(mapRecords(fish, 'Fish'));
+
+      // Build CSV string
+      let csvContent = header.join(',') + '\n' +
+        rows.map(row => row.map(escapeCSV).join(',')).join('\n');
+
+      // Download CSV file
+      const today = new Date().toISOString().slice(0, 10);
+      downloadCSV(`farm_records_all_${today}.csv`, csvContent);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile Setup - Farm Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      padding: 20px;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      max-width: 400px;
+      width: 100%;
+      padding: 30px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    h2 {
+      color: #2e8b57;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      margin-top: 15px;
+      color: #333;
+    }
+    input[type="text"],
+    input[type="file"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    input[type="file"] {
+      padding: 5px;
+    }
+    button {
+      margin-top: 30px;
+      padding: 12px;
+      background-color: #2e8b57;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #276847;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+      button {
+        font-size: 1rem;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Set Up Your Profile</h2>
+    <form id="profileForm">
+      <label for="farmName">Farm Name</label>
+      <input type="text" id="farmName" name="farmName" placeholder="Enter your farm's name" required />
+
+      <label for="managerName">Manager Name</label>
+      <input type="text" id="managerName" name="managerName" placeholder="Enter manager's name" required />
+
+      <label for="profilePic">Upload Farm Profile Picture</label>
+      <input type="file" id="profilePic" name="profilePic" accept="image/*" />
+
+      <button type="submit">Save Profile</button>
+    </form>
+  </div>
+
+<!-- profile-setup.html snippet - only the script part changed -->
+<script>
+    const form = document.getElementById('profileForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+  
+      const farmName = form.farmName.value.trim();
+      const managerName = form.managerName.value.trim();
+      const profilePicFile = form.profilePic.files[0];
+  
+      if (!farmName || !managerName) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+  
+      // Convert image to base64 so we can store and display it later
+      function getBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+        });
+      }
+  
+      let profilePicBase64 = null;
+      if (profilePicFile) {
+        try {
+          profilePicBase64 = await getBase64(profilePicFile);
+        } catch {
+          alert("Failed to read image file.");
+          return;
+        }
+      }
+  
+      // Save data in localStorage
+      localStorage.setItem('farmName', farmName);
+      localStorage.setItem('managerName', managerName);
+      if (profilePicBase64) {
+        localStorage.setItem('profilePic', profilePicBase64);
+      } else {
+        localStorage.removeItem('profilePic');
+      }
+  
+      // Redirect to dashboard
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crops Management</title>
+
+  <style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f8ff;
+  color: #333;
+  padding: 20px;
+  margin: 0;
+}
+
+h2, h3 {
+  color: #2e8b57;
+  margin-top: 0;
+}
+
+a.back-link {
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #2e8b57;
+  font-weight: bold;
+}
+
+a.back-link:hover {
+  text-decoration: underline;
+}
+
+form {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+form label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+form input, form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+form button[type="submit"] {
+  background-color: #2e8b57;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button[type="submit"]:hover {
+  background-color: #276847;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #2e8b57;
+  color: white;
+}
+
+.action-btn {
+  background-color: #c0392b;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background-color: #e74c3c;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  form input, form textarea, form button[type="submit"] {
+    font-size: 1rem;
+  }
+
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  th {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  td {
+    border: none;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+}
+
+
+
+    
+  </style>
+</head>
+<body>
+  <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+
+  <h2>Crops Management</h2>
+  <form id="cropsForm">
+    <label for="cropDate">Date:</label>
+    <input type="date" id="cropDate" required />
+
+    <label for="cropType">Crop Type:</label>
+    <input type="text" id="cropType" required />
+
+    <label for="activity">Activity:</label>
+    <input type="text" id="activity" />
+
+    <label for="expenses">Expenses (UGX):</label>
+    <input type="number" step="0.01" id="expenses" />
+
+    <label for="cropComments">Comments:</label>
+    <textarea id="cropComments" rows="3"></textarea>
+
+    <button type="submit">Save</button>
+  </form>
+
+  <h3>Crop Records</h3>
+  <table id="cropsReport">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Crop Type</th>
+        <th>Activity</th>
+        <th>Expenses</th>
+        <th>Comments</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const cropsForm = document.getElementById('cropsForm');
+    const cropsReportBody = document.querySelector('#cropsReport tbody');
+
+    function getCropsData() {
+      return JSON.parse(localStorage.getItem('cropsData')) || [];
+    }
+
+    function saveCropsData(data) {
+      localStorage.setItem('cropsData', JSON.stringify(data));
+    }
+
+    function displayCropsReport() {
+      const data = getCropsData();
+      cropsReportBody.innerHTML = '';
+      data.forEach((record, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${record.date}</td>
+          <td>${record.cropType}</td>
+          <td>${record.activity}</td>
+          <td>${record.expenses}</td>
+          <td>${record.comments}</td>
+          <td><button class="action-btn" data-index="${index}" data-action="delete-crop">Delete</button></td>
+        `;
+        cropsReportBody.appendChild(tr);
+      });
+    }
+
+    cropsForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const record = {
+        date: cropDate.value,
+        cropType: cropType.value.trim(),
+        activity: activity.value.trim(),
+        expenses: parseFloat(expenses.value || 0),
+        comments: cropComments.value.trim()
+      };
+      const data = getCropsData();
+      data.push(record);
+      saveCropsData(data);
+      cropsForm.reset();
+      displayCropsReport();
+    });
+
+    cropsReportBody.addEventListener('click', e => {
+      if (e.target.dataset.action === 'delete-crop') {
+        const index = parseInt(e.target.dataset.index);
+        const data = getCropsData();
+        data.splice(index, 1);
+        saveCropsData(data);
+        displayCropsReport();
+      }
+    });
+
+    displayCropsReport();
+    function getFishData() {
+  return JSON.parse(localStorage.getItem('fishData') || '[]');
+}
+
+function saveFishData(data) {
+  localStorage.setItem('fishData', JSON.stringify(data));
+}
+
+fishForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const newData = {
+    date: fishForm.date.value,
+    type: fishForm.type.value.trim(),
+    quantity: parseInt(fishForm.quantity.value),
+    notes: fishForm.notes.value.trim(),
+  };
+  const data = getFishData();
+  data.push(newData);
+  saveFishData(data);
+  fishForm.reset();
+  displayFishRecords();
+});
+
+  </script>
+</body>
+</html>

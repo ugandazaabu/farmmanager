@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farm Manager Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #2e8b57;
+      color: white;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .profile-pic {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      background-color: white;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .profile-info .farm-name {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .profile-info .manager-name {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    nav {
+      margin-top: 15px;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px 0;
+    }
+
+    nav button, nav a.tab-btn {
+      background: #2e8b57;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+      flex: 1 1 100px;
+      max-width: 150px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    nav button.active,
+    nav a.tab-btn.active,
+    nav button:hover,
+    nav a.tab-btn:hover {
+      background-color: #276847;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 20px;
+      background: white;
+      margin: 20px auto;
+      max-width: 900px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-height: 300px;
+    }
+
+    form label {
+      display: block;
+      margin: 8px 0 4px;
+      font-weight: 600;
+    }
+
+    form input, form textarea {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    form textarea {
+      resize: vertical;
+    }
+
+    form button[type="submit"] {
+      margin-top: 12px;
+      background-color: #2e8b57;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    form button[type="submit"]:hover {
+      background-color: #276847;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.9rem;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #2e8b57;
+      color: white;
+    }
+
+    .action-btn {
+      background: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background: #e74c3c;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      nav button, nav a.tab-btn {
+        flex: 1 1 40%;
+        max-width: none;
+      }
+
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      th {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+      }
+
+      td {
+        border: none;
+        position: relative;
+        padding-left: 50%;
+      }
+
+      td:before {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 45%;
+        white-space: nowrap;
+        font-weight: 600;
+        content: attr(data-label);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="profile">
+      <img src="" alt="Profile Picture" class="profile-pic" id="profilePic" />
+      <div class="profile-info">
+        <div class="farm-name" id="farmName">Farm Name</div>
+        <div class="manager-name" id="managerName">Manager Name</div>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <a href="poultry.html" class="tab-btn">Poultry</a>
+    <a href="crops.html" class="tab-btn">Crops</a>
+    <a href="pigs.html" class="tab-btn">Pigs</a>
+    <a href="fish.html" class="tab-btn">Fish</a>
+    <a href="rabbits.html" class="tab-btn">Rabbits</a>
+    <a href="reports.html" class="tab-btn">Reports</a>
+    <button class="tab-btn" data-tab="inventory">Inventory</button>
+  </nav>
+
+  <main>
+    <section id="inventory" class="tab-content" style="display:none;">
+      <h2>Inventory - Feed Purchases</h2>
+      <form id="inventoryForm">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required />
+
+        <label for="feedType">Type of Feeds:</label>
+        <input type="text" id="feedType" name="feedType" required />
+
+        <label for="sawdust">Sawdust (kg or yes/no):</label>
+        <input type="text" id="sawdust" name="sawdust" />
+
+        <label for="price">Price per Unit:</label>
+        <input type="number" step="0.01" id="price" name="price" required />
+
+        <label for="quantity">Quantity (bags, units):</label>
+        <input type="number" step="1" id="quantity" name="quantity" required />
+
+        <label for="kgs">Kgs (total weight):</label>
+        <input type="number" step="0.01" id="kgs" name="kgs" required />
+
+        <label for="costTransport">Cost of Transport:</label>
+        <input type="number" step="0.01" id="costTransport" name="costTransport" />
+
+        <label for="comments">Comments:</label>
+        <textarea id="comments" name="comments" rows="3"></textarea>
+
+        <button type="submit">Save</button>
+      </form>
+
+      <h3>Inventory Records</h3>
+      <table id="inventoryReport" aria-label="Inventory Records Table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type of Feeds</th>
+            <th>Sawdust</th>
+            <th>Price per Unit</th>
+            <th>Quantity</th>
+            <th>Kgs</th>
+            <th>Cost of Transport</th>
+            <th>Comments</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    // Load profile info
+    document.getElementById('farmName').textContent = localStorage.getItem('farmName') || 'Farm Name';
+    document.getElementById('managerName').textContent = localStorage.getItem('managerName') || 'Manager Name';
+    document.getElementById('profilePic').src = localStorage.getItem('profilePic') || 'https://via.placeholder.com/50?text=Farm';
+
+    // Tabs logic
+    const tabButtons = document.querySelectorAll('nav .tab-btn');
+    const tabContent = document.querySelectorAll('.tab-content');
+
+    function hideTabs() {
+      tabContent.forEach(tab => tab.style.display = 'none');
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+    }
+
+    function showTab(tabName) {
+      hideTabs();
+      const target = document.getElementById(tabName);
+      if (target) target.style.display = 'block';
+      tabButtons.forEach(btn => {
+        if (btn.dataset.tab === tabName) btn.classList.add('active');
+      });
+    }
+
+    tabButtons.forEach(button => {
+      if (button.tagName.toLowerCase() === 'button') {
+        button.addEventListener('click', e => {
+          e.preventDefault();
+          showTab(button.dataset.tab);
+        });
+      }
+    });
+
+    // Show inventory tab by default
+    showTab('inventory');
+
+    // Inventory logic
+    const inventoryForm = document.getElementById('inventoryForm');
+    const inventoryReportBody = document.querySelector('#inventoryReport tbody');
+
+    function getInventoryData() {
+      const data = localStorage.getItem('inventoryData');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveInventoryData(data) {
+      localStorage.setItem('inventoryData', JSON.stringify(data));
+    }
+
+    function displayInventoryReport() {
+      const data = getInventoryData();
+      inventoryReportBody.innerHTML = '';
+      data.forEach((record, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="Date">${record.date}</td>
+          <td data-label="Type of Feeds">${record.feedType}</td>
+          <td data-label="Sawdust">${record.sawdust || ''}</td>
+          <td data-label="Price">${record.price}</td>
+          <td data-label="Quantity">${record.quantity}</td>
+          <td data-label="Kgs">${record.kgs}</td>
+          <td data-label="Transport">${record.costTransport || ''}</td>
+          <td data-label="Comments">${record.comments || ''}</td>
+          <td data-label="Actions">
+            <button class="action-btn" data-index="${index}" data-action="delete">Delete</button>
+          </td>
+        `;
+        inventoryReportBody.appendChild(tr);
+      });
+    }
+
+    inventoryForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const newRecord = {
+        date: inventoryForm.date.value,
+        feedType: inventoryForm.feedType.value.trim(),
+        sawdust: inventoryForm.sawdust.value.trim(),
+        price: parseFloat(inventoryForm.price.value),
+        quantity: parseInt(inventoryForm.quantity.value),
+        kgs: parseFloat(inventoryForm.kgs.value),
+        costTransport: parseFloat(inventoryForm.costTransport.value || 0),
+        comments: inventoryForm.comments.value.trim(),
+      };
+      const data = getInventoryData();
+      data.push(newRecord);
+      saveInventoryData(data);
+      inventoryForm.reset();
+      displayInventoryReport();
+    });
+
+    inventoryReportBody.addEventListener('click', e => {
+      if (e.target.dataset.action === 'delete') {
+        const index = parseInt(e.target.dataset.index);
+        const data = getInventoryData();
+        data.splice(index, 1);
+        saveInventoryData(data);
+        displayInventoryReport();
+      }
+    });
+
+    displayInventoryReport();
+  </script>
+</body>
+</html>
