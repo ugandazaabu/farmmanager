@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Welcome to Farm Manager</title>
+  <link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#2d6a4f">
+
   <style>
     body {
       display: flex;
@@ -66,10 +69,18 @@
   </style>
 </head>
 <body>
-  <img src="images/farmmanager.png" alt="Farm Manager Logo" class="logo" />
+  <img src="images/smartphone.png" alt="Farm Manager Logo" class="logo" />
   <h1>Welcome to the Farm Manager</h1>
   <a href="profile-setup.html" class="next-btn" aria-label="Next">
     &#8594;
   </a>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('✅ Service Worker Registered', reg))
+        .catch(err => console.error('❌ Service Worker failed', err));
+    }
+  </script>
+  
 </body>
 </html>

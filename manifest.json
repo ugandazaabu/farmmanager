@@ -1,0 +1,21 @@
+{
+    "name": "Farm Manager",
+    "short_name": "FarmApp",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#f3f6f4",
+    "theme_color": "#2d6a4f",
+    "icons": [
+      {
+        "src": "icon-192.png",
+        "type": "images/smartphone.png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "icon-512.png",
+        "type": "images/smartphone.png",
+        "sizes": "512x512"
+      }
+    ]
+  }
+  
